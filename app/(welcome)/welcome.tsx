@@ -20,21 +20,21 @@ const OnboardingScreen = () => {
       id: 1,
       title: 'Discover Amazing Food',
       description: 'Browse through thousands of restaurants and dishes near you',
-      lottie: require('../assets/animations/food-delivery.json'),
+      lottie: require("@/assets/animations/food_delivery.json"),
       bg: '#F8F9FA',
     },
     {
       id: 2,
       title: 'Fast Delivery',
       description: 'Get your food delivered to your doorstep in record time',
-      lottie: require('../assets/animations/delivery-bike.json'),
+      lottie: require('@/assets/animations/delivery_bike.json'),
       bg: '#FFF9F2',
     },
     {
       id: 3,
       title: 'Easy Payment',
       description: 'Pay with your preferred method securely and conveniently',
-      lottie: require('../assets/animations/digital-wallet.json'),
+      lottie: require('@/assets/animations/wallet.json'),
       bg: '#F0F7FF',
     },
   ];
@@ -76,7 +76,7 @@ const OnboardingScreen = () => {
       setCurrentSlide(currentSlide + 1);
       pan.setValue({ x: 0, y: 0 });
     } else {
-      // Navigate to main app
+        saveOboardingStatus()
       
     }
   };
@@ -90,10 +90,15 @@ const OnboardingScreen = () => {
     }
   };
 
-  const skipOnboarding = () => {
-    
+  const skipOnboarding = async () => {
+    await saveOboardingStatus();
   };
 
+  const saveOboardingStatus = async () =>{
+//savce satus
+router.replace('/auth/sign-in');
+
+  }
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: slides[currentSlide].bg }]}>
       {/* Skip Button */}

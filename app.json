@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Grab & Go",
-    "slug": "Grab & Go",
+    "name": "Check In",
+    "slug": "check-in",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "grabandgo",
+    "scheme": "checkin",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {

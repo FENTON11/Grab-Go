@@ -1,92 +1,189 @@
-import { View, Text, ScrollView, Image, TextInput, TouchableOpacity } from 'react-native';
-import React, { useState } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, Text, TextInput, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { Feather } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-const Signup = () => {
-  const router = useRouter();
-  const [password, setPassword] = useState('');
+import { useState } from 'react';
+import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
+export default function SignUpScreen() {
+  type FormData = {
+    fullName: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+  };
+
+  const [formData, setFormData] = useState<FormData>({
+    fullName: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+  });
+  const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const validateForm = () => {
+    const newErrors: Partial<FormData> = {};
+    
+    if (!formData.fullName.trim()) newErrors.fullName = 'Full name is required';
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
+      newErrors.email = 'Email is invalid';
+    }
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
+    }
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = () => {
+    if (validateForm()) {
+      Alert.alert('Success', 'Account created successfully!');
+      // Here you would typically send data to your backend
+      // navigation.navigate('Home');
+    }
+  };
 
   return (
-    <SafeAreaView className='flex-1 bg-secondary'>
-      <StatusBar style='dark' backgroundColor='white' />
-      <ScrollView className='flex-1 pt-32'>
-        <Image
-          className='self-center h-[100px] w-[90px]'
-          source={require('@/assets/images/logo.png')}
-        />
-
-        <View className='px-5 pt-24'>
-          <Text className='text-accent text-3xl font-rubik-medium'>Sign Up</Text>
-          <Text className='text-gray-700 text-base font-rubik-medium mt-5'>
-            Enter credentials to continue
-          </Text>
-
-          {/* Username */}
-          <Text className='text-xl font-rubik-light text-gray-700 mt-10'>Username</Text>
+    <SafeAreaView className="flex-1 bg-white">
+    <StatusBar style="dark" />
+    <ScrollView 
+      className="flex-1 bg-white p-6"
+      contentContainerStyle={{ flexGrow: 1 }}
+      keyboardShouldPersistTaps="handled"
+    >
+      <StatusBar style="auto" />
+      
+      {/* Header with Logo */}
+      <View className="items-center mb-8 mt-10">
+        <Text className="text-3xl font-bold text-blue-600 mb-2 ">CHECK IN</Text>
+        <Text className="text-xl text-black">Create your account</Text>
+      </View>
+      
+      {/* Form */}
+      <View className="space-y-4 mb-6">
+        {/* Full Name */}
+        <View>
+          <Text className="text-black mb-1 text-2xl font-medium">Full Name</Text>
           <TextInput
-            maxLength={9}
-            placeholder='9 characters long'
-            keyboardType='name-phone-pad'
-            className='border-2 border-[#E3E3E3] rounded-lg px-4 py-3 mt-2 focus:border-primary'
+            className={`border rounded-lg p-3 text-black ${errors.fullName ? 'border-red-500' : 'border-gray-300'}`}
+            placeholder="Enter your full name"
+            placeholderTextColor="#9CA3AF"
+            value={formData.fullName}
+            onChangeText={(text) => setFormData({...formData, fullName: text})}
           />
-
-          {/* Email */}
-          <Text className='text-xl font-rubik-light text-gray-700 mt-10'>Email</Text>
-          <TextInput
-            placeholder='Enter email'
-            className='border-2 border-[#E3E3E3] rounded-lg px-4 py-3 mt-2 focus:border-primary'
-            keyboardType='email-address'
-          />
-
-          {/* Password */}
-          <Text className='text-xl font-rubik-light text-gray-700 mt-10'>Password</Text>
-          <View className='relative mt-2'>
-            <TextInput
-              value={password}
-              secureTextEntry={!showPassword}
-              onChangeText={setPassword}
-              maxLength={16}
-              placeholder='6 characters or more'
-              className='border-2 border-[#E3E3E3] rounded-lg px-4 py-3 pr-12 text-base text-gray-700 focus:border-primary'
-            />
-            <TouchableOpacity
-              onPress={() => setShowPassword(!showPassword)}
-              className='absolute right-4 top-3.5'
-            >
-              <Feather name={showPassword ? 'eye' : 'eye-off'} size={22} color='gray' />
-            </TouchableOpacity>
-          </View>
-          <Text
-            className="text-lg mt-5 tracking-[0.7px] leading-6 font-rubik-medium text-accent opacity-80"
-            numberOfLines={2}
-          >
-            By continuing you agree to our{' '}
-            <Text className="text-primary ">Terms of Service</Text> and{' '}
-            <Text className="text-primary ">Privacy Policy</Text>
-          </Text>
-
-          <TouchableOpacity className='bg-primary rounded-3xl mt-[30px] h-[70px] justify-center items-center'
-            activeOpacity={0.7}
-
-          >
-            <Text className='text-2xl text-secondary font-rubik-medium'>Sign Up</Text>
-          </TouchableOpacity>
-          <View className='flex-row justify-center items-center mt-5 gap-5'>
-            <Text className='text-base items-center font-rubik-medium'>Already have an account?</Text>
-            <TouchableOpacity
-              onPress={() => router.push('/auth/sign-in')}
-            >
-              <Text className='text-base text-primary font-rubik-medium'>Sign In</Text>
-            </TouchableOpacity>
-
-          </View>
+          {errors.fullName && <Text className="text-red-500 text-xs mt-1">{errors.fullName}</Text>}
         </View>
-      </ScrollView>
+        
+        {/* Email */}
+        <View>
+          <Text className="text-black mb-1 text-2xl font-medium">Email</Text>
+          <TextInput
+            className={`border rounded-lg p-3 text-black ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
+            placeholder="Enter your email"
+            placeholderTextColor="#9CA3AF"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            value={formData.email}
+            onChangeText={(text) => setFormData({...formData, email: text})}
+          />
+          {errors.email && <Text className="text-red-500 text-xs mt-1">{errors.email}</Text>}
+        </View>
+        
+        {/* Password */}
+        <View>
+          <Text className="text-black mb-1 text-2xl font-medium">Password</Text>
+          <View className={`flex-row items-center border rounded-lg pr-3 ${errors.password ? 'border-red-500' : 'border-gray-300'}`}>
+            <TextInput
+              className="flex-1 p-3 text-black"
+              placeholder="Enter your password"
+              placeholderTextColor="#9CA3AF"
+              secureTextEntry={!showPassword}
+              value={formData.password}
+              onChangeText={(text) => setFormData({...formData, password: text})}
+            />
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+              <MaterialIcons 
+                name={showPassword ? 'visibility-off' : 'visibility'} 
+                size={20} 
+                color="#6B7280" 
+              />
+            </TouchableOpacity>
+          </View>
+          {errors.password && <Text className="text-red-500 text-xs mt-1">{errors.password}</Text>}
+        </View>
+        
+        {/* Confirm Password */}
+        <View>
+          <Text className="text-black mb-1  text-2xl font-medium">Confirm Password</Text>
+          <View className={`flex-row items-center border rounded-lg pr-3 ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'}`}>
+            <TextInput
+              className="flex-1 p-3 text-black"
+              placeholder="Confirm your password"
+              placeholderTextColor="#9CA3AF"
+              secureTextEntry={!showConfirmPassword}
+              value={formData.confirmPassword}
+              onChangeText={(text) => setFormData({...formData, confirmPassword: text})}
+            />
+            <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+              <MaterialIcons 
+                name={showConfirmPassword ? 'visibility-off' : 'visibility'} 
+                size={20} 
+                color="#6B7280" 
+              />
+            </TouchableOpacity>
+          </View>
+          {errors.confirmPassword && <Text className="text-red-500 text-xs mt-1">{errors.confirmPassword}</Text>}
+        </View>
+        
+        {/* Terms and Conditions */}
+        <View className="flex-row items-center mt-2">
+          <TouchableOpacity className="mr-2">
+            <MaterialIcons name="check-box-outline-blank" size={32} color="#6B7280" />
+          </TouchableOpacity>
+          <Text className="text-black text-xl">
+            I agree to the <Text className="text-blue-600">Terms</Text> and <Text className="text-blue-600">Privacy Policy</Text>
+          </Text>
+        </View>
+        
+        {/* Sign Up Button */}
+        <TouchableOpacity 
+          className="bg-blue-600 py-3 rounded-lg mt-6"
+          onPress={handleSubmit}
+        >
+          <Text className="text-white text-center font-bold text-lg">Sign Up</Text>
+        </TouchableOpacity>
+        
+        {/* Social Login Options */}
+        <View className="flex-row justify-center space-x-4 mt-6">
+          <TouchableOpacity className="border border-gray-300 p-3 rounded-full">
+            <MaterialIcons name="facebook" size={24} color="#3b5998" />
+          </TouchableOpacity>
+          <TouchableOpacity className="border border-gray-300 p-3 rounded-full">
+            <FontAwesome name="google" size={24} color="#DB4437" />
+          </TouchableOpacity>
+          <TouchableOpacity className="border border-gray-300 p-3 rounded-full">
+            <MaterialIcons name="apple" size={24} color="black" />
+          </TouchableOpacity>
+        </View>
+      </View>
+      
+      {/* Footer */}
+      <View className="flex-row justify-center ">
+        <Text className="text-black">Already have an account? </Text>
+        <TouchableOpacity onPress={() => router.push('/auth/sign-in')}>
+          <Text className="text-blue-600 font-bold">Log In</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
     </SafeAreaView>
   );
-};
-
-export default Signup;
+}

@@ -7,7 +7,7 @@ const Protectedlayout = () => {
     const user = false; // Replace with your actual user authentication logic
   return (
   
-   user?<Slot/>:<Redirect href={"/"}/>
+   user ? <Slot /> : <Redirect href="/auth/sign-in" />
    
   )
 }

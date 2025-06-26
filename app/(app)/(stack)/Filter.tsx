@@ -1,123 +1,93 @@
-import React, { forwardRef, useImperativeHandle, useState } from 'react';
-import {
-  Modal,
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  Pressable,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
+import { useState } from 'react';
 
-export type FilterRef = {
-  open: () => void;
-  close: () => void;
-};
-
-const categories = ['Eggs', 'Noodles & Pasta', 'Chips & Crisps', 'Fast Food'];
-const brands = ['Individual Collection', 'Cocola', 'Ifad', 'Kazi Farmas'];
-
-const Filter = forwardRef<FilterRef>((_, ref) => {
-  const [visible, setVisible] = useState(false);
+export default function FilterScreen() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [selectedDate, setSelectedDate] = useState('Any date');
 
-  useImperativeHandle(ref, () => ({
-    open: () => setVisible(true),
-    close: () => setVisible(false),
-  }));
+  const categories = [
+    'Music', 'Sports', 'Conferences', 'Arts',
+    'Food & Drink', 'Tech'
+  ];
 
-  const toggleSelection = (
-    list: string[],
-    setList: React.Dispatch<React.SetStateAction<string[]>>,
-    item: string
-  ) => {
-    setList(prev =>
-      prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]
-    );
+  const dateOptions = [
+    'Any date',
+    'Today',
+    'Tomorrow',
+    'This weekend',
+    'Next week',
+    'This month'
+  ];
+
+  const toggleCategory = (category: string) => {
+    if (selectedCategories.includes(category)) {
+      setSelectedCategories(selectedCategories.filter(c => c !== category));
+    } else {
+      setSelectedCategories([...selectedCategories, category]);
+    }
   };
 
-  const renderCheckbox = (
-    item: string,
-    selected: boolean,
-    onPress: () => void
-  ) => (
-    <TouchableOpacity
-      key={item}
-      onPress={onPress}
-      className="flex-row items-center space-x-2 my-2"
-    >
-      <View
-        className={`w-6 h-6 rounded-md border-2 ${
-          selected ? 'bg-primary border-primary' : 'border-accent'
-        } items-center justify-center`}
-      >
-        {selected && <Ionicons name="checkmark" size={16} color="white" />}
-      </View>
-      <Text className={`${selected ? 'text-primary' : 'text-black'} text-base`}>
-        {item}
-      </Text>
-    </TouchableOpacity>
-  );
-
   return (
-    <Modal visible={visible} animationType="slide" transparent={false}>
-      <SafeAreaView className="flex-1 bg-secondary pt-14">
-       <StatusBar style='dark' backgroundColor='white' />
-        
-        {/* Header */}
-        <View className="flex-row justify-between items-center px-6">
-          <TouchableOpacity onPress={() => setVisible(false)}>
-            <Ionicons name="close" size={24} />
-          </TouchableOpacity>
-          <Text className="text-lg font-rubik-semibold">Filters</Text>
-          <View style={{ width: 24 }} /> 
-        </View>
-        <View className='rounded-t-3xl bg-[#B1B1B1]/50 flex-1 pt-10 mt-28'>
-
-        <ScrollView
-          className="px-6 mt-4"
-          contentContainerStyle={{ paddingBottom: 100 }}
+    <View className="flex-1 bg-white">
+      <StatusBar style="dark" />
+      
+      {/* Header */}
+      <View className="p-4 border-b border-gray-100">
+        <Text className="text-2xl font-bold text-black">Filters</Text>
+      </View>
+      
+      {/* Category Section */}
+      <View className="p-4 border-b border-gray-100">
+        <Text className="text-lg font-bold text-black mb-3">Category</Text>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingRight: 16 }}
         >
-          {/* Categories */}
-          <Text className="text-lg font-rubik-semibold mt-4 mb-2">Categories</Text>
-          {categories.map(cat =>
-            renderCheckbox(cat, selectedCategories.includes(cat), () =>
-              toggleSelection(categories, setSelectedCategories, cat)
-            )
-          )}
-
-          {/* Brands */}
-          <Text className="text-lg font-rubik-semibold mt-6 mb-2">Brand</Text>
-          {brands.map(brand =>
-            renderCheckbox(brand, selectedBrands.includes(brand), () =>
-              toggleSelection(brands, setSelectedBrands, brand)
-            )
-          )}
+          <View className="flex-row flex-wrap">
+            {categories.map((category) => (
+              <TouchableOpacity
+                key={category}
+                className={`px-4 py-2 rounded-full mr-2 mb-2 ${selectedCategories.includes(category) ? 'bg-blue-600' : 'bg-gray-100'}`}
+                onPress={() => toggleCategory(category)}
+              >
+                <Text className={`${selectedCategories.includes(category) ? 'text-white' : 'text-black'}`}>
+                  {category}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
         </ScrollView>
-
-        {/* Apply Button */}
-        <Pressable
-          onPress={() => {
-            console.log('Apply:', {
-              categories: selectedCategories,
-              brands: selectedBrands,
-            });
-            setVisible(false);
-          }}
-          className="absolute bottom-6 mx-6 rounded-2xl bg-primary py-4"
-          style={{ width: '90%' }}
+      </View>
+      
+      {/* Date Section */}
+      <View className="p-4">
+        <Text className="text-lg font-bold text-black mb-3">Date</Text>
+        {dateOptions.map((date) => (
+          <TouchableOpacity
+            key={date}
+            className="flex-row justify-between items-center py-3 border-b border-gray-100"
+            onPress={() => setSelectedDate(date)}
+          >
+            <Text className="text-black">{date}</Text>
+            {selectedDate === date && (
+              <MaterialIcons name="check" size={20} color="#3B82F6" />
+            )}
+          </TouchableOpacity>
+        ))}
+      </View>
+      
+      {/* Apply Button */}
+      <View className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100">
+        <TouchableOpacity 
+          className="bg-blue-600 py-3 rounded-lg"
+          onPress={() => console.log('Filters applied', { selectedCategories, selectedDate })}
         >
-          <Text className="text-white text-center font-rubik-medium text-base">
-            Apply Filter
-          </Text>
-        </Pressable>
-        </View>
-      </SafeAreaView>
-    </Modal>
+          <Text className="text-white text-center font-bold">Apply Filters</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
-});
-
-export default Filter;
+}
